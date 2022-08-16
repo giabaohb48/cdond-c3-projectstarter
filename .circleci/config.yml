@@ -326,16 +326,22 @@ workflows:
           requires: 
             - hello
       - test-frontend:
-          requires: [build-frontend]
-
-
-  scan-backend:
+          requires: 
+            - build-frontend
+      - scan-frontend:
+          requires:
+            - build-frontend
+            
+  backend:
     jobs:
       - hello
       - build-backend:
           requires:
             - hello
       - test-backend:
+          requires:
+            - build-backend
+      - scan-backend:
           requires:
             - build-backend
       # - scan-backend:
