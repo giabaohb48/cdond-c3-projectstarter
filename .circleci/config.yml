@@ -37,6 +37,21 @@ parameters:
     default: python:3.7-alpine3.11
 
 jobs:
+
+  hello:
+    docker:
+      - image: << pipeline.parameters.circleci_image >>
+    steps:
+      - run: echo "My pipeline id is << pipeline.id >> and my git branch is << pipeline.git.branch >>."
+      - run: printenv
+      - checkout
+      - run: pwd
+      - run: ls -Rla ~
+      - run: node -v
+      - run: df -h
+      - run: free -h
+
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -56,8 +71,6 @@ jobs:
           paths: 
             - frontend/node_modules
           key: frontend-build
-      - slack/status
-
 
   build-backend:
     docker:
@@ -78,7 +91,6 @@ jobs:
           paths: 
             - backend/node_modules
           key: backend-build
-      - slack/status
 
   test-frontend:
     docker:
@@ -307,14 +319,25 @@ jobs:
             
 
 workflows:
-  default:
+  frontend:
     jobs:
-      - build-frontend
-      - build-backend
+      - hello
+      - build-frontend:
+          requires: 
+            - hello
       - test-frontend:
           requires: [build-frontend]
+
+
+  scan-backend:
+    jobs:
+      - hello
+      - build-backend:
+          requires:
+            - hello
       - test-backend:
-          requires: [build-backend]
+          requires:
+            - build-backend
       # - scan-backend:
       #     requires: [build-backend]
       # - scan-frontend:
