@@ -2,9 +2,7 @@ version: 2.1
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID. 
     steps:
       - run:
           name: Destroy environments
@@ -14,9 +12,7 @@ commands:
             exit 1
 
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      # Add parameter here     
+    description: Revert the last migration if successfully run in the current workflow.  
     steps:
       - run:
           name: Revert migrations
@@ -31,7 +27,15 @@ commands:
             #  Add revert code here. You can find this in the Getting Started section.
               exit 1
             fi
-            
+
+parameters:
+  circleci_image:
+    type: string
+    default: circleci/node:latest
+  py_alp_image:
+    type: string
+    default: python:3.7-alpine3.11
+
 jobs:
   build-frontend:
     docker:
@@ -52,6 +56,8 @@ jobs:
           paths: 
             - frontend/node_modules
           key: frontend-build
+      - slack/status
+
 
   build-backend:
     docker:
@@ -72,6 +78,7 @@ jobs:
           paths: 
             - backend/node_modules
           key: backend-build
+      - slack/status
 
   test-frontend:
     docker:
