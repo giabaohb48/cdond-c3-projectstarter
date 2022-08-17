@@ -73,7 +73,8 @@ jobs:
           paths: 
             - frontend/node_modules
           key: frontend-build
-      - slack/status
+      - slack/status:
+          fail_only: false
 
   build-backend:
     docker:
@@ -93,7 +94,8 @@ jobs:
           paths: 
             - backend/node_modules
           key: backend-build
-      - slack/status
+      - slack/status:
+          fail_only: false
 
   test-frontend:
     docker:
@@ -108,7 +110,8 @@ jobs:
             cd frontend
             npm install
             npm run test
-      - slack/status
+      - slack/status:
+          fail_only: false
                 
   test-backend:
     docker:
@@ -123,7 +126,8 @@ jobs:
             cd backend
             npm install
             npm run test
-      - slack/status
+      - slack/status:
+          fail_only: false
 
   scan-frontend:
     docker:
@@ -139,7 +143,8 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - slack/status
+      - slack/status:
+          fail_only: false
 
 
   scan-backend:
@@ -156,7 +161,8 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - slack/status
+      - slack/status:
+          fail_only: false
 
       # Checkout code from git
       # Restore from cache
