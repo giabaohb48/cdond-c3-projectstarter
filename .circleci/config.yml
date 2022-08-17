@@ -36,9 +36,6 @@ parameters:
     type: string
     default: python:3.7-alpine3.11
 
-orbs: 
-  slack: circleci/slack@3.4.2
-
 jobs:
 
   hello:
@@ -73,7 +70,6 @@ jobs:
           paths: 
             - frontend/node_modules
           key: frontend-build
-      - slack/status
 
   build-backend:
     docker:
@@ -93,7 +89,6 @@ jobs:
           paths: 
             - backend/node_modules
           key: backend-build
-      - slack/status
 
   test-frontend:
     docker:
@@ -108,7 +103,6 @@ jobs:
             cd frontend
             npm install
             npm run test
-      - slack/status
                 
   test-backend:
     docker:
@@ -123,7 +117,6 @@ jobs:
             cd backend
             npm install
             npm run test
-      - slack/status
 
   scan-frontend:
     docker:
@@ -139,8 +132,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - slack/status
-
 
   scan-backend:
     docker:
@@ -156,7 +147,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - slack/status
 
       # Checkout code from git
       # Restore from cache
