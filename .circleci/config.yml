@@ -369,9 +369,6 @@ workflows:
     jobs:
       - hello
       - deploy-infrastructure:
-          requires: 
-            - test-frontend
-            - test-backend
           filters:
             branches:
               only: master
