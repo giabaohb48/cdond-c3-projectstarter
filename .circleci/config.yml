@@ -223,7 +223,7 @@ jobs:
           name: Install dependencies
           command: |
             pip install awscli
-            apk add --update ansible
+            apt update && install -y ansible
       - run:
           name: Configure server
           command: |
