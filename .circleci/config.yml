@@ -223,12 +223,14 @@ jobs:
           name: Install dependencies
           command: |
             pip install awscli
-            pip install --upgrade --user ansible
+            cd ~
+            python3 -m pip install --upgrade --user ansible
       - run:
           name: Configure server
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
-            sudo ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            cd ~
+            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
