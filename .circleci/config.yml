@@ -195,15 +195,18 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
+            echo "[web]" > .circleci/ansible/inventory.txt
+
+            BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
              --filters 'Name=tag:Name,Values=udapeople-backend-*' \
              --query "Reservations[*].Instances[0].PublicDnsName" \
-             --output text >> .circleci/ansible/inventory
-            cat .circleci/ansible/inventory
+             --output text)
+            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: .circleci/ansible/
           paths:
-            - inventory
+            - inventory.txt
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
@@ -225,7 +228,7 @@ jobs:
           name: Configure server
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i /tmp/.circleci/ansible/inventory .circleci/ansible/configure-server.yml
+            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
