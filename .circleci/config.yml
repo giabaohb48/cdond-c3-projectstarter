@@ -202,7 +202,7 @@ jobs:
       - persist_to_workspace:
           root: .circleci/ansible/
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - inventory.txt
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
@@ -378,7 +378,10 @@ workflows:
       - configure-infrastructure:
           requires: 
             - deploy-infrastructure
-      # - run-migrations:
+          filters:
+            branches:
+              only: master
+    # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
