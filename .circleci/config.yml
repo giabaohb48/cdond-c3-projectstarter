@@ -393,31 +393,31 @@ jobs:
             
 
 workflows:
-  frontend:
-    jobs:
-      - hello
-      - build-frontend:
-          requires: 
-            - hello
-      - test-frontend:
-          requires: 
-            - build-frontend
-      # - scan-frontend:
-      #     requires:
-      #       - build-frontend
+  # frontend:
+  #   jobs:
+  #     - hello
+  #     - build-frontend:
+  #         requires: 
+  #           - hello
+  #     - test-frontend:
+  #         requires: 
+  #           - build-frontend
+  #     # - scan-frontend:
+  #     #     requires:
+  #     #       - build-frontend
 
-  backend:
-    jobs:
-      - hello
-      - build-backend:
-          requires:
-            - hello
-      - test-backend:
-          requires:
-            - build-backend
-      # - scan-backend:
-      #     requires:
-      #       - build-backend
+  # backend:
+  #   jobs:
+  #     - hello
+  #     - build-backend:
+  #         requires:
+  #           - hello
+  #     - test-backend:
+  #         requires:
+  #           - build-backend
+  #     # - scan-backend:
+  #     #     requires:
+  #     #       - build-backend
 
   deploy:
     jobs:
@@ -435,12 +435,12 @@ workflows:
       - run-migrations:
             requires: 
               - configure-infrastructure
-      - deploy-frontend:
-          requires: 
-            - run-migrations
-      - deploy-backend:
-          requires: 
-            - run-migrations
+      # - deploy-frontend:
+      #     requires: 
+      #       - run-migrations
+      # - deploy-backend:
+      #     requires: 
+      #       - run-migrations
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
