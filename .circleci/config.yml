@@ -36,7 +36,7 @@ commands:
       - run:
           name: Revert migrations
           command: |
-            SUCCESS = $(curl --insecure https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl --insecure https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if [${SUCCESS} = "success"]; 
             then
               cd ~/project/backend
@@ -303,9 +303,9 @@ jobs:
           name: Install dependencies
           command: |
             apt update
-            apt install software-properties-common
+            apt install -y software-properties-common
             add-apt-repository --yes --update ppa:ansible/ansible
-            pip install ansible
+            pip install --upgrade --user ansible
             pip install awscli
       - run:
           name: install node modules
@@ -427,45 +427,45 @@ workflows:
   #     #     requires:
   #     #       - build-frontend
 
-  # backend:
-  #   jobs:
-  #     - hello
-  #     - build-backend:
-  #         requires:
-  #           - hello
-  #     - test-backend:
-  #         requires:
-  #           - build-backend
-  #     # - scan-backend:
-  #     #     requires:
-  #     #       - build-backend
-
-  deploy:
+  backend:
     jobs:
       - hello
-      - deploy-infrastructure:
-          filters:
-            branches:
-              only: master
-      - configure-infrastructure:
-          requires: 
-            - deploy-infrastructure
-          filters:
-            branches:
-              only: master
-      - run-migrations:
-            requires: 
-              - configure-infrastructure
-      - deploy-frontend:
-          requires: 
-            - run-migrations
-      - deploy-backend:
-          requires: 
-            - run-migrations
-      - smoke-test:
-          requires: 
-            - deploy-backend
-            - deploy-frontend
+      - build-backend:
+          requires:
+            - hello
+      - test-backend:
+          requires:
+            - build-backend
+      # - scan-backend:
+      #     requires:
+      #       - build-backend
+
+  # deploy:
+  #   jobs:
+  #     - hello
+  #     - deploy-infrastructure:
+  #         filters:
+  #           branches:
+  #             only: master
+  #     - configure-infrastructure:
+  #         requires: 
+  #           - deploy-infrastructure
+  #         filters:
+  #           branches:
+  #             only: master
+  #     - run-migrations:
+  #           requires: 
+  #             - configure-infrastructure
+  #     - deploy-frontend:
+  #         requires: 
+  #           - run-migrations
+  #     - deploy-backend:
+  #         requires: 
+  #           - run-migrations
+  #     - smoke-test:
+  #         requires: 
+  #           - deploy-backend
+  #           - deploy-frontend
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
