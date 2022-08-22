@@ -368,7 +368,7 @@ jobs:
               if curl -s ${URL} | grep "Welcome"
               then
                 echo "Success"
-                return 0
+                return 1
               else
                 echo "Failed"
                 return 1
