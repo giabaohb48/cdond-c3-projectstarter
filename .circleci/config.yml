@@ -249,11 +249,10 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            echo "insecure" >> ~/.curlrc
             if grep -q "has been executed successfully" ${MIGRATIONS_OUTPUT}; then
-              curl https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d "success"
+              curl --insecure https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d "success"
             else
-              curl https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d "failure"
+              curl --insecure https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d "failure"
             fi
       - destroy-environment
 
@@ -293,7 +292,7 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: python:3.9.13
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
@@ -306,7 +305,7 @@ jobs:
             apt-get update
             apt install -y software-properties-common
             apt install -y awscli
-            pip install --upgrade --user ansible
+            apt install ansible
       - run:
           name: install node modules
           command: |
@@ -389,9 +388,10 @@ jobs:
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
-            --stack-name InitialStack \
+            --stack-name udapeople-cloudfront \
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --tags project=udapeople
+            --tags project=udapeople \
+            -- region ${AWS_DEFAULT_REGION}
       # Here's where you will add some code to rollback on failure  
 
 # cleanup:
