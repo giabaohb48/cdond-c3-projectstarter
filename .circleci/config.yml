@@ -325,6 +325,17 @@ jobs:
             tar -zcvf api.tar.gz backend/
             mv api.tar.gz .circleci/ansible/roles/deploy/files/
       - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            echo "[web]" > .circleci/ansible/inventory.txt
+
+            BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
+             --filters 'Name=tag:Name,Values=udapeople-backend-*' \
+             --query "Reservations[*].Instances[0].PublicDnsName" \
+             --output text)
+            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - run:
           name: Deploy backend
           command: |
             export PATH=$PATH:~/.local/bin
