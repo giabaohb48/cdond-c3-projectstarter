@@ -323,7 +323,7 @@ jobs:
           name: zip file
           command: |
             tar -zcvf api.tar.gz backend/
-            mv api.tar.gz /root/project/.circleci/ansible/roles/deploy/files/
+            mv api.tar.gz .circleci/ansible/roles/deploy/files/
       - run:
           name: Deploy backend
           command: |
