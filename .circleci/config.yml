@@ -427,26 +427,26 @@ workflows:
   #     #     requires:
   #     #       - build-frontend
 
-  backend:
-    jobs:
-      - hello
-      - build-backend:
-          requires:
-            - hello
-      - test-backend:
-          requires:
-            - build-backend
-      # - scan-backend:
-      #     requires:
-      #       - build-backend
-
-  # deploy:
+  # backend:
   #   jobs:
   #     - hello
-  #     - deploy-infrastructure:
-  #         filters:
-  #           branches:
-  #             only: master
+  #     - build-backend:
+  #         requires:
+  #           - hello
+  #     - test-backend:
+  #         requires:
+  #           - build-backend
+  #     # - scan-backend:
+  #     #     requires:
+  #     #       - build-backend
+
+  deploy:
+    jobs:
+      - hello
+      - deploy-infrastructure:
+          filters:
+            branches:
+              only: master
   #     - configure-infrastructure:
   #         requires: 
   #           - deploy-infrastructure
