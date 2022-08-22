@@ -342,9 +342,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt-get update
-            apt install -y awscli
-            echo "insecure" >> ~/.curlrc
+            apk add --update curl
+            pip install awscli
       - run:
           name: Backend smoke test.
           command: |
@@ -354,7 +353,7 @@ jobs:
              --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
+            if curl --insecure "${API_URL}/api/status" | grep "ok"
             then
                 echo "Success"
                 return 0
@@ -367,7 +366,7 @@ jobs:
           command: |
               URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
               echo ${URL}
-              if curl -s ${URL} | grep "Welcome"
+              if curl -s --insecure ${URL} | grep "Welcome"
               then
                 echo "Success"
                 return 1
