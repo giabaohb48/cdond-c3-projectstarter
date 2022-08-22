@@ -305,7 +305,6 @@ jobs:
           command: |
             apt-get update
             apt install -y software-properties-common
-            add-apt-repository --yes --update ppa:ansible/ansible
             apt install -y awscli
             apt install -y ansible
       - run:
@@ -328,7 +327,6 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            printenv >> backend/.env
             export PATH=$PATH:~/.local/bin
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
