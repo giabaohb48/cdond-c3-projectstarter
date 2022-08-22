@@ -293,6 +293,7 @@ jobs:
   deploy-backend:
     docker:
       - image: circleci/node:13.8.0
+        user: root
     steps:
       - checkout
       - add_ssh_keys:
@@ -304,8 +305,9 @@ jobs:
           command: |
             apt-get update
             apt install -y software-properties-common
+            add-apt-repository --yes --update ppa:ansible/ansible
             apt install -y awscli
-            apt install ansible
+            apt install -y ansible
       - run:
           name: install node modules
           command: |
@@ -336,6 +338,7 @@ jobs:
   smoke-test:
     docker:
       - image: python:3.9.13-alpine
+        user: root
     steps:
       - checkout
       - run:
