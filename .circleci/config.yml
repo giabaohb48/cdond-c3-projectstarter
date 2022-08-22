@@ -48,9 +48,6 @@ parameters:
   circleci_image:
     type: string
     default: circleci/node:latest
-  py_alp_image:
-    type: string
-    default: python:3.7-alpine3.11
 
 jobs:
 
@@ -251,7 +248,6 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            echo "insecure" >> ~/.curlrc
             if grep -q "has been executed successfully" ${MIGRATIONS_OUTPUT}; then
               curl https://kvdb.io/Hi6oGLXyCADsFAV84ignVE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d "success"
             else
@@ -335,28 +331,50 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - destroy-environment
       - revert-migrations
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image 
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+
+  smoke-test:
+    docker:
+      - image: python:3.9.13-alpine
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            apt install -y awscli
+      - run:
+          name: Backend smoke test.
+          command: |
+            BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
+             --filters 'Name=tag:Name,Values=udapeople-backend-*' \
+             --query "Reservations[*].Instances[0].PublicDnsName" \
+             --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                echo "Success"
+                return 0
+            else
+                echo "Failed"
+                return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+              URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+              echo ${URL} 
+              if curl -s ${URL} | grep "Welcome"
+              then
+                echo "Success"
+                return 0
+              else
+                echo "Failed"
+                return 1
+              fi
+      - destroy-environment
+      - revert-migrations
+      # Here's where you will add some code to rollback on failure  
 
 #   cloudfront-update:
 #     docker:
@@ -436,14 +454,16 @@ workflows:
       - run-migrations:
             requires: 
               - configure-infrastructure
-      # - deploy-frontend:
-      #     requires: 
-      #       - run-migrations
-      # - deploy-backend:
-      #     requires: 
-      #       - run-migrations
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+      - deploy-frontend:
+          requires: 
+            - run-migrations
+      - deploy-backend:
+          requires: 
+            - run-migrations
+      - smoke-test:
+          requires: 
+            - deploy-backend
+            - deploy-frontend
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
