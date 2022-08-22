@@ -302,11 +302,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt update
+            apt-get update
             apt install -y software-properties-common
+            apt install -y awscli
             add-apt-repository --yes --update ppa:ansible/ansible
             pip install --upgrade --user ansible
-            pip install awscli
       - run:
           name: install node modules
           command: |
@@ -447,25 +447,25 @@ workflows:
           filters:
             branches:
               only: master
-  #     - configure-infrastructure:
-  #         requires: 
-  #           - deploy-infrastructure
-  #         filters:
-  #           branches:
-  #             only: master
-  #     - run-migrations:
-  #           requires: 
-  #             - configure-infrastructure
-  #     - deploy-frontend:
-  #         requires: 
-  #           - run-migrations
-  #     - deploy-backend:
-  #         requires: 
-  #           - run-migrations
-  #     - smoke-test:
-  #         requires: 
-  #           - deploy-backend
-  #           - deploy-frontend
+      - configure-infrastructure:
+          requires: 
+            - deploy-infrastructure
+          filters:
+            branches:
+              only: master
+      - run-migrations:
+            requires: 
+              - configure-infrastructure
+      - deploy-frontend:
+          requires: 
+            - run-migrations
+      - deploy-backend:
+          requires: 
+            - run-migrations
+      - smoke-test:
+          requires: 
+            - deploy-backend
+            - deploy-frontend
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
