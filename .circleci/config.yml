@@ -383,6 +383,10 @@ jobs:
       - attach_workspace:
           at: /tmp/
       - run:
+          name: install tar gzip
+          command: |
+            yum install -y tar gzip
+      - run:
           name: Update cloudfront distribution
           command: |
             aws cloudformation list-exports \
