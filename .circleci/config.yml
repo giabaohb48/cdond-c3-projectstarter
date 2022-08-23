@@ -420,15 +420,9 @@ jobs:
         - attach_workspace:
             at: /tmp
         - run:
-            name: Get old stack workflow id
-            command: |
-              export OldWorkflowID=$(cat /tmp/get_old_workflowID.txt)
-              echo OldWorkflowID: "${OldWorkflowID}"
-              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-
-        - run:
             name: Remove old stacks and files
             command: |
+              export OldWorkflowID=$(cat /tmp/get_old_workflowID.txt)
               echo OldWorkflowID: "${OldWorkflowID}"
               echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
              
