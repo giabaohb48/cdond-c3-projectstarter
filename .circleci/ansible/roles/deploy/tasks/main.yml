@@ -17,5 +17,5 @@
 
 - name: "executing node"
   command: |
-    cd /home/ubuntu/backend/
     pm2 start npm --name 'udapeople' -- start
+  chdir: /home/ubuntu/backend/
