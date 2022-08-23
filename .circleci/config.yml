@@ -380,12 +380,14 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/
       - run:
           name: Update cloudfront distribution
           command: |
-            export OldWorkflowID=$(aws cloudformation \
-                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-                    --no-paginate --output text)
+            aws cloudformation list-exports \
+              --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text > /tmp/get_old_workflowID.txt
 
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
@@ -396,7 +398,10 @@ jobs:
 
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
-
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - get_old_workflowID.txt
       # Here's where you will add some code to rollback on failure  
 
   cleanup:
@@ -404,22 +409,21 @@ jobs:
         - image: amazon/aws-cli
       steps:
         - checkout
+        - attach_workspace:
+            at: /tmp
         - run:
             name: Get old stack workflow id
             command: |
-              export OldWorkflowID=$(aws cloudformation \
-                      list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-                      --no-paginate --output text)
+              export OldWorkflowID=$(cat /tmp/get_old_workflowID.txt)
               echo OldWorkflowID: "${OldWorkflowID}"
               echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
 
-              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-                      --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-              echo Stack names: "${STACKS[@]}"
         - run:
             name: Remove old stacks and files
             command: |
-              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              echo OldWorkflowID: "${OldWorkflowID}"
+              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
               then
                 echo '-------------------delete comfirmed---------------------'
                 aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
