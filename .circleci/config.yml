@@ -159,8 +159,7 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+            npm audit
 
   deploy-infrastructure:
     docker:
@@ -394,7 +393,7 @@ jobs:
             --stack-name udapeople-cloudfront \
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople \
-            -- region ${AWS_DEFAULT_REGION}
+            --region ${AWS_DEFAULT_REGION}
 
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
@@ -430,7 +429,7 @@ jobs:
               else
                 echo '--------------------cannot cleanup---------------------'
               fi
-            
+        - destroy-environment
 
 workflows:
   # frontend:
