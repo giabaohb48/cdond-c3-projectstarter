@@ -4,17 +4,6 @@
     src: api.tar.gz
     dest: /home/ubuntu/
 
-# - name: "check folder backend"
-#   command: |
-#     ls -al /home/ubuntu/backend/
-#   register: output_check
-#   debug:
-#     var: output_check.stdout_lines
-# - name: "copy files from CircleCI to server"
-#   copy:
-#     src: /root/project/backend
-#     dest: /home/ubuntu
-
 - name: "executing node"
   command: |
     pm2 start npm --name 'udapeople' -- start
