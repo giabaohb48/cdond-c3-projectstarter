@@ -18,4 +18,8 @@
 - name: "executing node"
   command: |
     pm2 start npm --name 'udapeople' -- start
+  register: cmd_output
   chdir: /home/ubuntu/backend/
+
+- debug:
+    var: cmd_output
