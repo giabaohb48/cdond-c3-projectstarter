@@ -262,6 +262,8 @@ jobs:
         user: root
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
       - run:
           name: Install dependencies
           command: |
@@ -270,10 +272,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
-             --filters 'Name=tag:Name,Values=udapeople-backend-*' \
-             --query "Reservations[*].Instances[0].PublicDnsName" \
-             --output text)
+            BACKEND_IP=$(tail -1 /tmp/.circleci/ansible/inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL=$API_URL >> frontend/.env
@@ -339,6 +338,8 @@ jobs:
         user: root
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
       - run:
           name: Install dependencies
           command: |
@@ -347,10 +348,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
-             --filters 'Name=tag:Name,Values=udapeople-backend-*' \
-             --query "Reservations[*].Instances[0].PublicDnsName" \
-             --output text)
+            export BACKEND_IP=$(tail -1 /tmp/.circleci/ansible/inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl --insecure "${API_URL}/api/status" | grep "ok"
@@ -389,8 +387,6 @@ jobs:
             export OldWorkflowID=$(aws cloudformation \
                     list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                     --no-paginate --output text)
-            echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
@@ -398,26 +394,41 @@ jobs:
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople \
             -- region ${AWS_DEFAULT_REGION}
+
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
+
       # Here's where you will add some code to rollback on failure  
 
-# cleanup:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Get old stack workflow id
-#           command: |
-#             # your code here
-#             export OldWorkflowID="the id here"
-#             export STACKS=[] #put the list of stacks here
-#       - run:
-#           name: Remove old stacks and files
-#           command: |
-#             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-#             then
-#               # your code here
-#             fi
+  cleanup:
+      docker:
+        - image: amazon/aws-cli
+      steps:
+        - checkout
+        - run:
+            name: Get old stack workflow id
+            command: |
+              export OldWorkflowID=$(aws cloudformation \
+                      list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                      --no-paginate --output text)
+              echo OldWorkflowID: "${OldWorkflowID}"
+              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+
+              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                      --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+              echo Stack names: "${STACKS[@]}"
+        - run:
+            name: Remove old stacks and files
+            command: |
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              then
+                echo '-------------------delete comfirmed---------------------'
+                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              else
+                echo '--------------------cannot cleanup---------------------'
+              fi
             
 
 workflows:
