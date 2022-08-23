@@ -3,10 +3,13 @@
   unarchive:
     src: api.tar.gz
     dest: /home/ubuntu/
+    command: |
+      ls -al /home/ubuntu/backend/
 
 - name: "executing node"
   command: |
-    cd /home/ubuntu/backend/dist
+    cd /home/ubuntu/backend/dist/
+    npm install
     pm2 stop default
     pm2 start npm --name 'udapeople' -- start
     pm2 ls
