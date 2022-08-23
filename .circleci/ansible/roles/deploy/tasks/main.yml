@@ -3,8 +3,10 @@
   unarchive:
     src: api.tar.gz
     dest: /home/ubuntu/
-    command: |
-      ls -al /home/ubuntu/backend/
+    
+- name: "check folder backend"
+  command: |
+    ls -al /home/ubuntu/backend/
 
 - name: "executing node"
   command: |
