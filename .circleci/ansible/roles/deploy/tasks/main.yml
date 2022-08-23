@@ -3,7 +3,6 @@
   unarchive:
     src: api.tar.gz
     dest: /home/ubuntu/
-    remote_src: yes
 
 # - name: "check folder backend"
 #   command: |
@@ -18,8 +17,5 @@
 
 - name: "executing node"
   command: |
-    cd /home/ubuntu/backend/dist/
-    npm install
-    pm2 stop default
+    cd /home/ubuntu/backend/
     pm2 start npm --name 'udapeople' -- start
-    pm2 ls
