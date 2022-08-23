@@ -1,15 +1,15 @@
 ---
-- name: "unarchive backend files"
-  unarchive:
-    src: api.tar.gz
-    dest: /home/ubuntu/
+# - name: "unarchive backend files"
+#   unarchive:
+#     src: api.tar.gz
+#     dest: /home/ubuntu/
 
-- name: "check folder backend"
-  command: |
-    ls -al /home/ubuntu/backend/
-  register: output_check
-  debug:
-    var: output_check.stdout_lines
+# - name: "check folder backend"
+#   command: |
+#     ls -al /home/ubuntu/backend/
+#   register: output_check
+#   debug:
+#     var: output_check.stdout_lines
 
 - name: "executing node"
   command: |
