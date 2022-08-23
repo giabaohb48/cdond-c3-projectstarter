@@ -190,9 +190,8 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             EC2_tagged=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            echo "[web]" > .circleci/ansible/inventory.txt
             BACKEND_IP=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} \
-             --filters 'Name=tag:Name,Values=${EC2_tagged}' \
+             --filters "Name=tag:Name,Values=${EC2_tagged}" \
              --query "Reservations[*].Instances[*].PublicDnsName" \
              --output text)
             echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
