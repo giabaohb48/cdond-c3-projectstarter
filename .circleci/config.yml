@@ -314,23 +314,24 @@ jobs:
       - run:
           name: build backend dist
           command: |
-            printenv >> backend/.env
+            printenv
+            printenv > backend/.env
             cd backend
             npm run build
             npm run prestart:prod
-      # - run:
-      #     name: zip file
-      #     command: |
-      #       tar -zcvf api.tar.gz backend/
-      #       mv api.tar.gz .circleci/ansible/roles/deploy/files/
+      - run:
+          name: zip file
+          command: |
+            tar -zcvf api.tar.gz backend/
+            mv api.tar.gz .circleci/ansible/roles/deploy/files/
       - run:
           name: Deploy backend
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
-      - destroy-environment
-      - revert-migrations
+      # - destroy-environment
+      # - revert-migrations
 
   smoke-test:
     docker:

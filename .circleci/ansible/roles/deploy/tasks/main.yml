@@ -1,8 +1,9 @@
 ---
-# - name: "unarchive backend files"
-#   unarchive:
-#     src: api.tar.gz
-#     dest: /home/ubuntu/
+- name: "unarchive backend files"
+  unarchive:
+    src: api.tar.gz
+    dest: /home/ubuntu/
+    remote_src: yes
 
 # - name: "check folder backend"
 #   command: |
@@ -10,10 +11,10 @@
 #   register: output_check
 #   debug:
 #     var: output_check.stdout_lines
-- name: "copy files from CircleCI to server"
-  copy:
-    src: /root/project/backend
-    dest: /home/ubuntu
+# - name: "copy files from CircleCI to server"
+#   copy:
+#     src: /root/project/backend
+#     dest: /home/ubuntu
 
 - name: "executing node"
   command: |
