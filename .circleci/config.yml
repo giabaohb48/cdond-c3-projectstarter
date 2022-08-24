@@ -146,6 +146,7 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+            echo "ok"
 
   scan-backend:
     docker:
