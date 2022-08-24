@@ -438,61 +438,61 @@ jobs:
         - destroy-environment
 
 workflows:
-  # frontend:
-  #   jobs:
-  #     - hello
-  #     - build-frontend:
-  #         requires: 
-  #           - hello
-  #     - test-frontend:
-  #         requires: 
-  #           - build-frontend
-  #     # - scan-frontend:
-  #     #     requires:
-  #     #       - build-frontend
-
-  # backend:
-  #   jobs:
-  #     - hello
-  #     - build-backend:
-  #         requires:
-  #           - hello
-  #     - test-backend:
-  #         requires:
-  #           - build-backend
-  #     # - scan-backend:
-  #     #     requires:
-  #     #       - build-backend
-
-  deploy:
+  frontend:
     jobs:
       - hello
-      - deploy-infrastructure:
-          filters:
-            branches:
-              only: master
-      - configure-infrastructure:
+      - build-frontend:
           requires: 
-            - deploy-infrastructure
-          filters:
-            branches:
-              only: master
-      - run-migrations:
-            requires: 
-              - configure-infrastructure
-      - deploy-frontend:
+            - hello
+      - test-frontend:
           requires: 
-            - run-migrations
-      - deploy-backend:
-          requires: 
-            - run-migrations
-      - smoke-test:
-          requires: 
-            - deploy-backend
-            - deploy-frontend
-      - cloudfront-update:
+            - build-frontend
+      - scan-frontend:
           requires:
-            - smoke-test
-      - cleanup:
+            - build-frontend
+
+  backend:
+    jobs:
+      - hello
+      - build-backend:
           requires:
-            - cloudfront-update
+            - hello
+      - test-backend:
+          requires:
+            - build-backend
+      - scan-backend:
+          requires:
+            - build-backend
+
+  # deploy:
+  #   jobs:
+  #     - hello
+  #     - deploy-infrastructure:
+  #         filters:
+  #           branches:
+  #             only: master
+  #     - configure-infrastructure:
+  #         requires: 
+  #           - deploy-infrastructure
+  #         filters:
+  #           branches:
+  #             only: master
+  #     - run-migrations:
+  #           requires: 
+  #             - configure-infrastructure
+  #     - deploy-frontend:
+  #         requires: 
+  #           - run-migrations
+  #     - deploy-backend:
+  #         requires: 
+  #           - run-migrations
+  #     - smoke-test:
+  #         requires: 
+  #           - deploy-backend
+  #           - deploy-frontend
+  #     - cloudfront-update:
+  #         requires:
+  #           - smoke-test
+  #     - cleanup:
+  #         requires:
+  #           - cloudfront-update
